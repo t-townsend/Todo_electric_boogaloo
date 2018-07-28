@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>To Do List</title>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyC1QBGsYt9cz-1_gZrT9fH7vkP-yqdlSUw",
+        authDomain: "week8-de4ef.firebaseapp.com",
+        databaseURL: "https://week8-de4ef.firebaseio.com",
+        projectId: "week8-de4ef",
+        storageBucket: "week8-de4ef.appspot.com",
+        messagingSenderId: "902844651292"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      // $(document).on("ready", function(){});
+      // $(document).ready(function(){});
+      $(function(){
+        let tasksRef = firebase.database().ref('/tasks');
+        tasksRef.on("child_added", function(data) {
+          console.log(data);
+          console.log(data.key);
+          console.log(data.val());
+          let taskKey = data.key;
+          let taskObj = data.val();
+
+          // <li id='1'>
+          $('ol').append(`<li id='${taskKey}'>${taskObj.taskName}<button class="delete">Delete</button></li>`);
+
+          $('.delete').click(function(){
+            console.log("delete clicked?");
+            let id = $(this).parent().attr('id');
+            firebase.database().ref(`tasks/${ id }`).remove();
+
+            $(this).parent().fadeOut(function(){
+              $(this).remove();
+            });
+          });
+          // $('#task').val('').focus();
+
+
+        });
+        // on("value")
+        // on("change")
+        // on("added")
+        // on("removed")
+
+
+        $('#task').focus();
+        // the document is ready when this line of code is hit!
+        $('form').submit(function(event){
+          event.preventDefault();
+          console.log("the form was submitted!");
+
+          // $('input[name=task]')
+          // $('input[type=text]')
+          let task = $('#task').val(); // getter & setter, attribute accessor
+          // $('#task').val("Denis");
+          // $('.task') // class
+
+          // add it to the list of task
+          // $('ol').append(`<li>${task}</li>`);
+          // instead of adding it to the list right away
+          // we store it into the database... and that's it.
+          tasksRef.push({taskName: task});
+
+          $('#task').val('').focus();
+          // $('ol').append('<li>' + task + '</li>');
+          // make sure it's decorated
+        });
+        // $('#new-task').submit();
+      });
+    </script>
+  </head>
+  <body>
+    <h2>New Task</h2>
+    <!-- REST - Representation State Transfer -->
+    <!-- POST & GET -->
+    <!-- GET -->
+    <!-- ?task=Wash+Dishes <- parameter list -->
+    <!-- ?task=Wash+Dishes&time=19%3A39 -->
+    <!-- Parameter Object -->
+    <!-- param = {
+      task: "Wash dishes",
+      time: "19 %3A 39"
+    } -->
+    <form id="new-task" action="" method="POST">
+      <input id="task" name="task" type="text">
+      <input name="time" type="time">
+      <input type="submit">
+    </form>
+
+    <h1>To Do List</h1>
+    <ol>
+      <!-- <li>Walk the dog</li>
+      <li>Wash clothes</li>
+      <li>Study WebGL</li>
+      <li>Eat Dinner</li> -->
+    </ol>
+  </body>
+</html>
